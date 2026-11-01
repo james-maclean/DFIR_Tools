@@ -88,6 +88,9 @@ class edge:
 
 def export_to_csv(user, browser):
     user_history = f"/Users/{user}/" + browser.file_path
+    if not os.path.exists(user_history):
+        print(f"History database for {browser.name} could not be found, skipping")
+        return
     conn = sqlite3.connect(user_history)
     cur = conn.cursor()
     browser_history = cur.execute(browser.sql)
