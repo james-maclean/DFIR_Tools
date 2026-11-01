@@ -17,4 +17,4 @@ It dumps the browser history for the three main browsers into the `/tmp/` direct
 
 **Usage**
 
-`browser_history.py username`
+`python3 ./browser_history.py username`
