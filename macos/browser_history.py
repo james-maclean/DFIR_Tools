@@ -1,7 +1,9 @@
 import csv
 import os
+import shutil
 import sqlite3
 import sys
+import tempfile
 
 # Not sure why Safari has its own epoch, but it does. Classic Apple. safari_epoch_offset = 978307200
 
@@ -91,21 +93,27 @@ def export_to_csv(user, browser):
     if not os.path.exists(user_history):
         print(f"History database for {browser.name} could not be found, skipping")
         return
-    conn = sqlite3.connect(user_history)
-    cur = conn.cursor()
-    browser_history = cur.execute(browser.sql)
-    with open(f"/tmp/{browser.name}_history.csv", "w", newline="") as csv_file:
-        writer = csv.writer(csv_file)
-
-        # Write headers
-        column_names = [desc[0] for desc in browser_history.description]
-
-        writer.writerow(column_names)
-
-        # Write data rows
-
-        writer.writerows(browser_history)
-    conn.close()
+    # Creating a temporary copy of the database to work with, as some
+    # browsers lock the database whilst they are open.
+    # NOTE - this is not the safest way of doing this.
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = os.path.join(temp_dir, f"{browser.name}_temp.db")
+        shutil.copy2(user_history, temp_path)
+        conn = sqlite3.connect(temp_path)
+        cur = conn.cursor()
+        browser_history = cur.execute(browser.sql)
+        try:
+            with open(f"/tmp/{browser.name}_history.csv", "w", newline="") as csv_file:
+                writer = csv.writer(csv_file)
+                # Write headers
+                column_names = [desc[0] for desc in browser_history.description]
+                writer.writerow(column_names)
+                # Write data rows
+                writer.writerows(browser_history)
+                conn.close()
+            print(f"/tmp/{browser.name}_history.csv saved.")
+        except Exception:
+            print(f"Saving CSV for {browser.name} failed.")
 
 
 if __name__ == "__main__":
