@@ -102,14 +102,18 @@ def export_to_csv(user, browser):
         conn = sqlite3.connect(temp_path)
         cur = conn.cursor()
         browser_history = cur.execute(browser.sql)
-        with open(f"/tmp/{browser.name}_history.csv", "w", newline="") as csv_file:
-            writer = csv.writer(csv_file)
-            # Write headers
-            column_names = [desc[0] for desc in browser_history.description]
-            writer.writerow(column_names)
-            # Write data rows
-            writer.writerows(browser_history)
-            conn.close()
+        try:
+            with open(f"/tmp/{browser.name}_history.csv", "w", newline="") as csv_file:
+                writer = csv.writer(csv_file)
+                # Write headers
+                column_names = [desc[0] for desc in browser_history.description]
+                writer.writerow(column_names)
+                # Write data rows
+                writer.writerows(browser_history)
+                conn.close()
+            print(f"/tmp/{browser.name}_history.csv saved.")
+        except Exception:
+            print(f"Saving CSV for {browser.name} failed.")
 
 
 if __name__ == "__main__":
