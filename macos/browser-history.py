@@ -91,7 +91,7 @@ def export_to_csv(user, browser):
     conn = sqlite3.connect(user_history)
     cur = conn.cursor()
     browser_history = cur.execute(browser.sql)
-    with open(f"{browser.name}_history.csv", "w", newline="") as csv_file:
+    with open(f"/tmp/{browser.name}_history.csv", "w", newline="") as csv_file:
         writer = csv.writer(csv_file)
 
         # Write headers
