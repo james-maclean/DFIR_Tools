@@ -14,5 +14,7 @@ The tools are primarily to make responding quicker.
 
 This script takes a single command line argument as a valid user, or runs as the current user. 
 It dumps the browser history for the three main browsers into the `/tmp/` directory as CSVs, ideal for picking up using an RMM or similar. 
+
 **Usage**
+
 `browser_history.py username`
